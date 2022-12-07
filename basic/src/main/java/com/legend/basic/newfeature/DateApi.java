@@ -5,19 +5,39 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 /**
- *  在旧版的JAVA中，日期时间api存在诸多问题，
- *  1. 非线程安全： java.util.Date是非线程安全的，所有的日期类都是可变的，这是JAVA日期类的最大的问题之一
- *  2. 设计很差：JAVA的日期/时间类的定义并不一致，在java.util和java.sql的包中都有日期类，此外用于格式化和解析的类被定义在java.text包中。
- *     java.util.Date同时包含日期和时间，而java.sql.Date仅包含日期，将其纳入java.sql包并不合理。另外这两个类都有相同的名字，
- *     这本身就是一个非常糟糕的设计
- *  3. 时区处理麻烦：日期类并不提供国际化，没有时区支持，因此JAVA引入了java.util.Calendar和java.util.TimeZone类，但它们同样存在上述所有问题
- *  因为这些原因，诞生了第三方库Joda-Time,可以替代JAVA的时间管理API
- *
- *  jdk8新的时间和日期管理api深受joda-time影响，
- *  新的java.time包包含了所有关于日期、时间、时区、Instant(跟日期类似但精确到纳秒)、duration(持续时间)和时钟操作的类
- *  新设计的api考虑了这些类的不变形，如果某个实例需要修改，则返回一个新的对象。
+ * 在旧版的JAVA中，日期时间api存在诸多问题，
+ * 1. 非线程安全： java.util.Date是非线程安全的，所有的日期类都是可变的，这是JAVA日期类的最大的问题之一
+ * 2. 设计很差：JAVA的日期/时间类的定义并不一致，在java.util和java.sql的包中都有日期类，此外用于格式化和解析的类被定义在java.text包中。
+ * java.util.Date同时包含日期和时间，而java.sql.Date仅包含日期，将其纳入java.sql包并不合理。另外这两个类都有相同的名字，
+ * 这本身就是一个非常糟糕的设计
+ * 3. 时区处理麻烦：日期类并不提供国际化，没有时区支持，因此JAVA引入了java.util.Calendar和java.util.TimeZone类，但它们同样存在上述所有问题
+ * 因为这些原因，诞生了第三方库Joda-Time,可以替代JAVA的时间管理API
+ * <p>
+ * jdk8新的时间和日期管理api深受joda-time影响，
+ * 新的java.time包包含了所有关于日期、时间、时区、Instant(跟日期类似但精确到纳秒)、duration(持续时间)和时钟操作的类
+ * 新设计的api考虑了这些类的不变形，如果某个实例需要修改，则返回一个新的对象。
  */
 public class DateApi {
+
+    static class DateUtils {
+
+        public static Date asDate(LocalDate localDate) {
+            return Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+        }
+
+        public static Date asDate(LocalDateTime localDateTime) {
+            return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+        }
+
+        public static LocalDate asLocalDate(Date date) {
+            return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
+        }
+
+        public static LocalDateTime asLocalDateTime(Date date) {
+            return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
+    }
+
     public static void main(String[] args) {
         // 1. Clock类
         // clock类使用时区来返回当前的纳秒时间和日期
@@ -71,6 +91,7 @@ public class DateApi {
         Date date = new Date();
         // 将java8 java.util.date转换为localdatetime
         System.out.println("LocalDateTime: " + date.toInstant().atOffset(ZoneOffset.of("+8")).toLocalDateTime());
+        LocalDateTime ldt = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         //LocalDateTime: 2022-12-07T17:46:47.309
         //2.7 LocalDateTime时间加减
         System.out.println("当前时间：" + localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
