@@ -1,0 +1,4 @@
+
+# 已有maven项目如何支持 java & scal
+已有的maven新增module
+module的lib需要新增（download or browse）scala sdk
