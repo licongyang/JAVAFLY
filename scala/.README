@@ -1,4 +1,6 @@
 
 # 已有maven项目如何支持 java & scal
-已有的maven新增module
-module的lib需要新增（download or browse）scala sdk
+1. 已有的maven project 新增module
+2. plugins -> 安装 scala插件 （或者本地安装scala sdk, 这里两者都安装了）
+3. project 项目名右键 -> add framework support -> 勾选上scala选项
+4. project structor -> lib -> module的lib 需要新增 scala sdk（download or browse，这里browse 本地scala sdk）
